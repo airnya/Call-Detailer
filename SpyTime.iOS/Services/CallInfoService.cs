@@ -13,6 +13,6 @@ namespace SpyTime.iOS.Services
 {
     public class CallInfoService : IDeviceState
     {
-        public event StateHandler StateHandler;
+        public event StateHandler CallFinished;
     }
 }

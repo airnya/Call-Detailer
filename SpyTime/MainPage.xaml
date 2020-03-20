@@ -11,9 +11,6 @@
         <Label Text="Welcome to Xamarin.Forms!" 
            HorizontalOptions="Center"
            VerticalOptions="CenterAndExpand" />
-        <Label Text="{Binding Duratation}" HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" FontSize="22" TextColor="Black"/>
-        <Button Clicked="GetCallInfo"/>
     </StackLayout>
 
 </ContentPage>

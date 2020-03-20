@@ -12,10 +12,10 @@ namespace SpyTime.Services
         Offhook
     }
 
-    public delegate void StateHandler( ICallInfo callInfo );
+    public delegate void StateHandler( ICall callInfo );
 
     public interface IDeviceState
     {
-        event StateHandler StateHandler;
+        event StateHandler CallFinished;
     }
 }

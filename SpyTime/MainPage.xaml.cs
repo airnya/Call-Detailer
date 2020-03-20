@@ -21,10 +21,10 @@ namespace SpyTime
         public MainPage( )
         {
             InitializeComponent( );
-            _deviceState.StateHandler += _deviceState_StateHandler;
+            _deviceState.CallFinished += GetCallInfo;
         }
 
-        private void _deviceState_StateHandler( ICallInfo callInfo )
+        private void GetCallInfo( ICall callInfo )
         {
             var a  = callInfo;
         }

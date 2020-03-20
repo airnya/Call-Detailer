@@ -22,13 +22,14 @@ namespace SpyTime.Droid.Services
 {
     public class CallInfoService : PhoneStateListener, IDeviceState
     {
-        public event StateHandler StateHandler;
-        public bool IsNewCall { get; set; } = false;
+        public event StateHandler CallFinished;
+        bool IsNewCall { get; set; } = false;
         public CallInfoService( )
         {
             var telephonyService = (TelephonyManager)Application.Context.GetSystemService( Context.TelephonyService );
             telephonyService.Listen( this, PhoneStateListenerFlags.CallState );
         }
+
         public override void OnCallStateChanged( [GeneratedEnum] CallState state, string phoneNumber )
         {
             base.OnCallStateChanged( state, phoneNumber );
@@ -37,7 +38,7 @@ namespace SpyTime.Droid.Services
             {
                 case CallState.Idle:
 
-                    if( IsNewCall ) StateChanged( );
+                    if( IsNewCall ) CallFinished?.Invoke( GetCallLogs( ) );
                     IsNewCall = false;
                     break;
 
@@ -54,45 +55,28 @@ namespace SpyTime.Droid.Services
             }
         }
 
-        public void StateChanged( )
+        private Call GetCallLogs( )
         {
-            StateHandler?.Invoke( GetCallLogs( ) );
-        }
-
-        private CallInfo GetCallLogs( )
-        {
-            //string queryFilter = String.Format( "{0}={1}", CallLog.Calls.Type, (int)CallType.Outgoing );
             string querySorter = string.Format( "{0} desc ", CallLog.Calls.Date );
 
-            var Columns = new string[]
+            ICursor data = Application.Context.ContentResolver
+                .Query( CallLog.Calls.ContentUri, null, null, null, querySorter );
+
+            int number = data.GetColumnIndex( CallLog.Calls.Number );
+            int duration = data.GetColumnIndex( CallLog.Calls.Duration );
+            int date = data.GetColumnIndex( CallLog.Calls.Date );
+
+            if( data.MoveToFirst( ) == true )
             {
-                CallLog.Calls.PhoneAccountId,
-                CallLog.Calls.Number,
-                CallLog.Calls.Date,
-                CallLog.Calls.Duration,
-                CallLog.Calls.Type
-            };
-
-            ICursor queryData1 = Android.App.Application.Context.ContentResolver.Query( CallLog.Calls.ContentUri, null, null, null, querySorter );
-
-            int number = queryData1.GetColumnIndex( CallLog.Calls.Number );
-            int duration1 = queryData1.GetColumnIndex( CallLog.Calls.Duration );
-            int date = queryData1.GetColumnIndex( CallLog.Calls.Date );
-
-            if( queryData1.MoveToFirst( ) == true )
-            {
-                //var dialed = queryData1.GetLong( queryData1.GetColumnIndex( CallLog.Calls.Date ) );                
-                //to get phNumber
-                //string phNumber = queryData1.GetString( number );
-                //string callDuration = queryData1.GetString( duration1 );
-                long dateTime = queryData1.GetLong( date );
-                return new CallInfo
+                long dateTime = data.GetLong( date );
+                return new Call
                 {
-                    CallDuratation = queryData1.GetInt( duration1 ),
-                    DialedNumber = queryData1.GetString( number ),
-                    CallDateTime = new DateTime( ) + TimeSpan.FromTicks( dateTime )
+                    CallDuratation = data.GetInt( duration ),
+                    DialedNumber = data.GetString( number ),
+                    CallDateTime = new DateTime( dateTime )
                 };
             }
+
             return null;
         }
     }
