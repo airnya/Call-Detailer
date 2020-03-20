@@ -23,11 +23,12 @@ namespace SpyTime.Droid.Services
     public class CallInfoService : PhoneStateListener, IDeviceState
     {
         public event StateHandler CallFinished;
-        bool IsNewCall { get; set; } = false;
+        bool IsNewCall = false;
         public CallInfoService( )
         {
-            var telephonyService = (TelephonyManager)Application.Context.GetSystemService( Context.TelephonyService );
-            telephonyService.Listen( this, PhoneStateListenerFlags.CallState );
+            var telService = (TelephonyManager)Application.Context
+                .GetSystemService( Context.TelephonyService );
+            telService.Listen( this, PhoneStateListenerFlags.CallState );
         }
 
         public override void OnCallStateChanged( [GeneratedEnum] CallState state, string phoneNumber )

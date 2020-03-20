@@ -21,12 +21,13 @@ namespace SpyTime
         public MainPage( )
         {
             InitializeComponent( );
-            _deviceState.CallFinished += GetCallInfo;
+            _deviceState.CallFinished += CallFinishedHandler;
         }
 
-        private void GetCallInfo( ICall callInfo )
+        private async void CallFinishedHandler( ICall callInfo )
         {
-            var a  = callInfo;
+            await DisplayAlert( "Info send", Newtonsoft.Json.JsonConvert
+                .SerializeObject( callInfo ), "OK");
         }
     }
 }
